@@ -65,10 +65,10 @@ class arm_dynamic_crop():
 
     self.broadcast_tf2()
     if (self.tool == 'camera_tool'):
-      print(self.cam_params)
+      # print(self.cam_params)
       self.cam_tool_client.update_configuration(self.cam_params)
     else:
-      print(self.end_eff_params)
+      # print(self.end_eff_params)
 
       self.end_eff_client.update_configuration(self.end_eff_params)
 
@@ -134,7 +134,6 @@ class arm_dynamic_crop():
                                        'cam_min_values', frame)
           cam_max_frame = PoseStamped()
           cam_max_frame.header = cam_max_values.header
-          print(cam_max_frame.header)
           cam_max_frame.pose.position.x = cam_max_values.transform.translation.x
           cam_max_frame.pose.position.y =  cam_max_values.transform.translation.y
           cam_max_frame.pose.position.z =  cam_max_values.transform.translation.z
@@ -154,10 +153,9 @@ class arm_dynamic_crop():
           self.cam_params['max_z'] = cam_max_frame.pose.position.z
         else:
           # END EFFECTOR CROPBOX
-          print('here')
-          end_eff_max_values = self.publish_tf(acos(end_eff.transform.translation.x/1.3)+ 2.2, 
+          end_eff_max_values = self.publish_tf(acos(end_eff.transform.translation.x/1.3)+ 4, 
                                        self.arms_link_tf.transform.translation.y + 1.2,
-                                       -acos(((end_eff.transform.translation.z-1.41)/2.73)) + 1.3,
+                                       -acos(((end_eff.transform.translation.z-1.41)/2.73))*1.2 + 0.7,
                                        'max_values')
           end_eff_min_values = self.publish_tf(acos(end_eff.transform.translation.x/1.3), 
                                        self.arms_link_tf.transform.translation.y - 1.2,

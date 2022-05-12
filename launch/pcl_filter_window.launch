@@ -2,51 +2,33 @@
 
 <launch>
 
-   <!-- The namespace to use (if enabled) -->
-   <!-- <arg name="namespace" default="$(env UAV_NAME)"/> -->
    <arg name="arm_main" default="end_effector"/>
    <arg name="arm_end" default="camera_tool"/>
 
 
-  <!-- With namespace -->
-  <!-- <group ns="$(arg namespace)"> -->
-<!--         <node pkg="convexhull_3d_pcl" type="convexhull_3d_pcl" name="camera_link_convexhull_3d_pcl" output="screen" >
-            <param name="tool" value="$(arg arm_end)"/>
-            <param name="path_topic" value="camera_link/control_manager/trajectory_original/poses"/>
-            <param name="out_array_topic" value="camera_link/convexhull/window_poses"/>
-            <param name="dynamic_service" value="camera_link/window_crop_box/set_parameters"/>
+    <node pkg="nodelet" type="nodelet" name="$(arg arm_main)_pcl_manager_filter" args="manager" output="screen" />
 
-            
-            
-        </node> -->
+    <node pkg="nodelet" type="nodelet" name="$(arg arm_main)_crop_box" args="load pcl/CropBox $(arg arm_main)_pcl_manager_filter" output="screen">
+        <remap from="~input" to="front_lslidar_point_cloud" />
+        <remap from="~output" to="$(arg arm_main)/crop" />
+    </node>
 
-
-   <!-- </group>         -->
+    <node pkg="pcl_clustering" type="pcl_dynamic_crop.py" name="$(arg arm_main)_dynamic_pcl_crop" output="screen">
+        <param name="~tool_crop" value="$(arg arm_main)"/>              
+    </node>
         
-        <node pkg="nodelet" type="nodelet" name="$(arg arm_end)_pcl_manager_filter" args="manager" output="screen" />
+    <node pkg="nodelet" type="nodelet" name="$(arg arm_end)_pcl_manager_filter" args="manager" output="screen" />
 
-        <node pkg="nodelet" type="nodelet" name="$(arg arm_end)_crop_box" args="load pcl/CropBox $(arg arm_end)_pcl_manager_filter" output="screen">
-                <remap from="~input" to="front_lslidar_point_cloud" />
-                <remap from="~output" to="$(arg arm_end)/crop" />
-            </node>
+    <node pkg="nodelet" type="nodelet" name="$(arg arm_end)_crop_box" args="load pcl/CropBox $(arg arm_end)_pcl_manager_filter" output="screen">
+        <remap from="~input" to="front_lslidar_point_cloud" />
+        <remap from="~output" to="$(arg arm_end)/crop" />
+    </node>
 
-<!--         <node pkg="pcl_clustering" type="pcl_dynamic_crop.py" name="$(arg arm_end)_dynamic_pcl_crop" output="screen">
-            <param name="~tool_crop" value="$(arg arm_end)"/>              
-        </node> -->
+    <node pkg="pcl_clustering" type="pcl_dynamic_crop.py" name="$(arg arm_end)_dynamic_pcl_crop" output="screen">
+        <param name="~tool_crop" value="$(arg arm_end)"/>              
+    </node>
 
 
-
-   <!-- </group>         -->
         
-        <node pkg="nodelet" type="nodelet" name="$(arg arm_main)_pcl_manager_filter" args="manager" output="screen" />
-
-        <node pkg="nodelet" type="nodelet" name="$(arg arm_main)_crop_box" args="load pcl/CropBox $(arg arm_main)_pcl_manager_filter" output="screen">
-                <remap from="~input" to="front_lslidar_point_cloud" />
-                <remap from="~output" to="$(arg arm_main)/crop" />
-            </node>
-
-        <node pkg="pcl_clustering" type="pcl_dynamic_crop.py" name="$(arg arm_main)_dynamic_pcl_crop" output="screen">
-            <param name="~tool_crop" value="$(arg arm_main)"/>              
-        </node>
 
 </launch>
