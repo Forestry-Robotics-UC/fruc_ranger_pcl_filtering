@@ -14,7 +14,7 @@ import tf
 from geometry_msgs.msg import TransformStamped, PoseStamped
 import tf2_geometry_msgs
 import tf_conversions # Because of transformations
-from math import asin, acos
+from math import asin, acos, atan
 
 
 
@@ -43,12 +43,11 @@ class arm_dynamic_crop():
 	    self._transform_broadcaster = tf2_ros.TransformBroadcaster()
 
 
-
 	def pcl_callback(self, ros_msg):
 
 		self.params = self.broadcast_tf2()
 
-		print(self.params)
+		# print(self.params)
 		self.client.update_configuration(self.params)
 
 
@@ -76,7 +75,7 @@ class arm_dynamic_crop():
 	    transform.transform.rotation.z = trans.transform.rotation.z
 	    transform.transform.rotation.w  = trans.transform.rotation.w
 	    self._transform_broadcaster.sendTransform(transform)
-	    print(transform)
+	    # print(transform)
 	    return transform
 
 
@@ -95,7 +94,7 @@ class arm_dynamic_crop():
 			try:
 				end_eff = tf_buffer.lookup_transform(self.output_frame, 'end_effector_link', rospy.Time(), rospy.Duration(3.0))
 				arms = tf_buffer.lookup_transform(self.input_frame, 'end_effector_link', rospy.Time(), rospy.Duration(3.0))
-				# print(arms, arms2)
+
 				if arms.transform.translation.z > 2.73:
 				    arms.transform.translation.z = 2.73
 				value = (arms.transform.translation.z-1.413525)/2.5
@@ -112,20 +111,21 @@ class arm_dynamic_crop():
 				t.transform.rotation.y = q[1]
 				t.transform.rotation.z = q[2]
 				t.transform.rotation.w = q[3]
+				self._transform_broadcaster.sendTransform(t)
 
 
 
-
+				print(arms.transform.translation.x/1.3,acos(arms.transform.translation.x/1.3))
 				min_x = arms.transform.translation.x
 				max_x = arms.transform.translation.x*1.2 + 1.2
 
-				max_values = self.publish_tf(arms.transform.translation.x*1.2 + 1.2, 
-																		 t.transform.translation.y + 0.9,
-																		 (asin((arms.transform.translation.z-1.413525)/2.5) + 0.9),
+				max_values = self.publish_tf(acos(arms.transform.translation.x/1.3)+ 2.4, 
+																		 t.transform.translation.y + 0.85,
+																		 -acos((arms.transform.translation.z/2.73)) + 1.3,
 																		 'max_values', t)
-				min_values = self.publish_tf(arms.transform.translation.x - 0.6, 
-																		 t.transform.translation.y - 0.9,
-																		 (asin((arms.transform.translation.z-1.413525)/2.5) + 0.2),
+				min_values = self.publish_tf(acos(arms.transform.translation.x/1.3) + 0.7, 
+																		 t.transform.translation.y - 0.85,
+																		 -acos((arms.transform.translation.z/2.73)),
 																		 'min_values', t)
 
 				max_frame = PoseStamped()
