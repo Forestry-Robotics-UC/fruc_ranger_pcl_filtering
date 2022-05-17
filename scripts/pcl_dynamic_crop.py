@@ -87,10 +87,14 @@ class arm_dynamic_crop():
       transform.transform.translation.x = x
       transform.transform.translation.y = y
       transform.transform.translation.z = z
-      transform.transform.rotation.x = self.arms_link_tf.transform.rotation.x
-      transform.transform.rotation.y = self.arms_link_tf.transform.rotation.y
-      transform.transform.rotation.z = self.arms_link_tf.transform.rotation.z
-      transform.transform.rotation.w  = self.arms_link_tf.transform.rotation.w
+      # transform.transform.rotation.x = self.arms_link_tf.transform.rotation.x
+      # transform.transform.rotation.y = self.arms_link_tf.transform.rotation.y
+      # transform.transform.rotation.z = self.arms_link_tf.transform.rotation.z
+      # transform.transform.rotation.w  = self.arms_link_tf.transform.rotation.w
+      transform.transform.rotation.x = 0
+      transform.transform.rotation.y = 0
+      transform.transform.rotation.z = 0
+      transform.transform.rotation.w  = 1
       self._transform_broadcaster.sendTransform(transform)
       return transform
 
@@ -152,14 +156,19 @@ class arm_dynamic_crop():
           self.cam_params['min_z'] = cam_min_frame.pose.position.z
           self.cam_params['max_z'] = cam_max_frame.pose.position.z
         else:
+          z_value_max = end_eff.transform.translation.z - self.arms_link_tf.transform.translation.z
+          if z_value_max > 0.25:
+            z_value_max = 0.25
+          if z_value_max < -0.9:
+            z_value_max = -0.9
           # END EFFECTOR CROPBOX
-          end_eff_max_values = self.publish_tf(acos(end_eff.transform.translation.x/1.3)+ 4, 
-                                       self.arms_link_tf.transform.translation.y + 1.2,
-                                       -acos(((end_eff.transform.translation.z-1.41)/2.73))*1.2 + 0.7,
+          end_eff_max_values = self.publish_tf(acos(end_eff.transform.translation.x/1.3) + 2.2, 
+                                       self.arms_link_tf.transform.translation.y  + 0.9,
+                                       z_value_max,
                                        'max_values')
-          end_eff_min_values = self.publish_tf(acos(end_eff.transform.translation.x/1.3), 
-                                       self.arms_link_tf.transform.translation.y - 1.2,
-                                       -acos((end_eff.transform.translation.z/2.73)),
+          end_eff_min_values = self.publish_tf(acos(-(end_eff.transform.translation.x/1.3)) - 2.0, 
+                                       self.arms_link_tf.transform.translation.y - 0.9,
+                                       -asin((end_eff.transform.translation.z/2.73)),
                                        'min_values')
 
           
