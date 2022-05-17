@@ -20,15 +20,12 @@
     <node pkg="nodelet" type="nodelet" name="$(arg arm_end)_pcl_manager_filter" args="manager" output="screen" />
 
     <node pkg="nodelet" type="nodelet" name="$(arg arm_end)_crop_box" args="load pcl/CropBox $(arg arm_end)_pcl_manager_filter" output="screen">
-        <remap from="~input" to="front_lslidar_point_cloud" />
+        <remap from="~input" to="$(arg arm_main)/crop" />
         <remap from="~output" to="$(arg arm_end)/crop" />
     </node>
 
     <node pkg="pcl_clustering" type="pcl_dynamic_crop.py" name="$(arg arm_end)_dynamic_pcl_crop" output="screen">
         <param name="~tool_crop" value="$(arg arm_end)"/>              
     </node>
-
-
-        
 
 </launch>

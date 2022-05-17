@@ -41,7 +41,7 @@ class arm_dynamic_crop():
                'max_z' :  1.0,
                'output_frame' : self.output_frame,
                'input_frame'  : self.input_frame,
-               'negative' : 0,
+               'negative' : 1,
                'keep_organized' : 1
       }
 
@@ -132,8 +132,12 @@ class arm_dynamic_crop():
           z_min_value = end_eff.transform.translation.z - 0.45
           if z_min_value < 0.3:
             z_min_value = 0.3
+          x_max_value = camera.transform.translation.x + 0.7
+          if x_max_value < end_eff.transform.translation.x + 0.3:
+            x_max_value = end_eff.transform.translation.x + 0.3
+
           # print(z_min_value - end_eff.transform.translation.z)
-          cam_max_values = self.publish_tf(camera.transform.translation.x + 0.7, 
+          cam_max_values = self.publish_tf(x_max_value, 
                                        camera.transform.translation.y + 1.2,
                                        camera.transform.translation.z + 0.3,
                                        'cam_max_values', frame)
