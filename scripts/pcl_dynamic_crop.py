@@ -52,6 +52,7 @@ class arm_dynamic_crop():
         self.cam_tool_client = dynamic_reconfigure.client.Client(self.cam_tool_crop_node)
         self.cam_params = self.params
       else: 
+        print("at end eff")
         self.end_eff_crop_node = '/end_effector_crop_box'
         self.end_eff_client = dynamic_reconfigure.client.Client(self.end_eff_crop_node)
         self.end_eff_params = self.params
@@ -131,12 +132,12 @@ class arm_dynamic_crop():
           z_min_value = end_eff.transform.translation.z - 0.45
           if z_min_value < 0.3:
             z_min_value = 0.3
-          print(z_min_value - end_eff.transform.translation.z)
+          # print(z_min_value - end_eff.transform.translation.z)
           cam_max_values = self.publish_tf(camera.transform.translation.x + 0.7, 
                                        camera.transform.translation.y + 1.2,
-                                       camera.transform.translation.z + 0.2,
+                                       camera.transform.translation.z + 0.3,
                                        'cam_max_values', frame)
-          cam_min_values = self.publish_tf(end_eff.transform.translation.x - 0.1, 
+          cam_min_values = self.publish_tf(end_eff.transform.translation.x - 0.35, 
                                        camera.transform.translation.y - 1.2,
                                        z_min_value,
                                        'cam_min_values', frame)
@@ -156,26 +157,26 @@ class arm_dynamic_crop():
           # cam_min_frame = self.change_frame(cam_min_frame, self.input_frame)
 
           self.cam_params['min_x'] = cam_min_frame.pose.position.x 
-          self.cam_params['max_x'] = cam_max_frame.pose.position.x 
           self.cam_params['min_y'] = cam_min_frame.pose.position.y 
-          self.cam_params['max_y'] = cam_max_frame.pose.position.y 
           self.cam_params['min_z'] = cam_min_frame.pose.position.z
+          self.cam_params['max_x'] = cam_max_frame.pose.position.x 
+          self.cam_params['max_y'] = cam_max_frame.pose.position.y 
           self.cam_params['max_z'] = cam_max_frame.pose.position.z
           self.cam_params['input_frame'] = frame
           # print(self.cam_params, cam_min_frame, cam_max_frame)
         else:
-          z_value_max = end_eff.transform.translation.z - self.arms_link_tf.transform.translation.z
+          z_value_max = end_eff.transform.translation.z - self.arms_link_tf.transform.translation.z + 0.2
           if z_value_max > 0.25:
             z_value_max = 0.25
           if z_value_max < -0.9:
             z_value_max = -0.9
           # END EFFECTOR CROPBOX
-          end_eff_max_values = self.publish_tf(acos(end_eff.transform.translation.x/1.3) + 2.2, 
+          end_eff_max_values = self.publish_tf(acos(end_eff.transform.translation.x/1.3) + 2.35, 
                                        self.arms_link_tf.transform.translation.y  + 0.9,
-                                       z_value_max,
+                                       z_value_max ,
                                        'max_values')
-          end_eff_min_values = self.publish_tf(acos(-(end_eff.transform.translation.x/1.3)) - 2.0, 
-                                       self.arms_link_tf.transform.translation.y - 0.9,
+          end_eff_min_values = self.publish_tf(acos(-(end_eff.transform.translation.x/1.3)) - 2.5, 
+                                       self.arms_link_tf.transform.translation.y - 1.0,
                                        -asin((end_eff.transform.translation.z/2.73)),
                                        'min_values')
 
@@ -194,12 +195,12 @@ class arm_dynamic_crop():
           end_eff_min_frame.pose.position.z =  end_eff_min_values.transform.translation.z
 
           self.end_eff_params['min_x'] = end_eff_min_frame.pose.position.x 
-          self.end_eff_params['max_x'] = end_eff_max_frame.pose.position.x 
           self.end_eff_params['min_y'] = end_eff_min_frame.pose.position.y 
+          self.end_eff_params['min_z'] = end_eff_min_frame.pose.position.z
+          self.end_eff_params['max_x'] = end_eff_max_frame.pose.position.x 
           self.end_eff_params['max_y'] = end_eff_max_frame.pose.position.y
-          self.end_eff_params['min_z'] = end_eff_min_frame.pose.position.z 
           self.end_eff_params['max_z'] = end_eff_max_frame.pose.position.z
-
+          self.end_eff_params['input_frame'] = self.input_frame
       except (tf2_ros.LookupException, 
               tf2_ros.ConnectivityException, 
               tf2_ros.ExtrapolationException) as e:

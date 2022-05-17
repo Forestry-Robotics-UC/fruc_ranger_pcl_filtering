@@ -6,7 +6,7 @@
    <arg name="arm_end" default="camera_tool"/>
 
 
-<!--     <node pkg="nodelet" type="nodelet" name="$(arg arm_main)_pcl_manager_filter" args="manager" output="screen" />
+    <node pkg="nodelet" type="nodelet" name="$(arg arm_main)_pcl_manager_filter" args="manager" output="screen" />
 
     <node pkg="nodelet" type="nodelet" name="$(arg arm_main)_crop_box" args="load pcl/CropBox $(arg arm_main)_pcl_manager_filter" output="screen">
         <remap from="~input" to="front_lslidar_point_cloud" />
@@ -16,7 +16,7 @@
     <node pkg="pcl_clustering" type="pcl_dynamic_crop.py" name="$(arg arm_main)_dynamic_pcl_crop" output="screen">
         <param name="~tool_crop" value="$(arg arm_main)"/>              
     </node>
-         -->
+        
     <node pkg="nodelet" type="nodelet" name="$(arg arm_end)_pcl_manager_filter" args="manager" output="screen" />
 
     <node pkg="nodelet" type="nodelet" name="$(arg arm_end)_crop_box" args="load pcl/CropBox $(arg arm_end)_pcl_manager_filter" output="screen">
