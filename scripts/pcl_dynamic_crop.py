@@ -128,33 +128,41 @@ class arm_dynamic_crop():
         if (self.tool == 'camera_tool'):
           # CAMERA TOOL CROPBOX
           frame = self.output_frame
-          cam_max_values = self.publish_tf(camera.transform.translation.x + 0.8, 
-                                       camera.transform.translation.y + 0.9,
+          z_min_value = end_eff.transform.translation.z - 0.45
+          if z_min_value < 0.3:
+            z_min_value = 0.3
+          print(z_min_value - end_eff.transform.translation.z)
+          cam_max_values = self.publish_tf(camera.transform.translation.x + 0.7, 
+                                       camera.transform.translation.y + 1.2,
                                        camera.transform.translation.z + 0.2,
                                        'cam_max_values', frame)
           cam_min_values = self.publish_tf(end_eff.transform.translation.x - 0.1, 
-                                       camera.transform.translation.y - 1.1,
-                                       end_eff.transform.translation.z - 0.4,
+                                       camera.transform.translation.y - 1.2,
+                                       z_min_value,
                                        'cam_min_values', frame)
           cam_max_frame = PoseStamped()
           cam_max_frame.header = cam_max_values.header
           cam_max_frame.pose.position.x = cam_max_values.transform.translation.x
           cam_max_frame.pose.position.y =  cam_max_values.transform.translation.y
           cam_max_frame.pose.position.z =  cam_max_values.transform.translation.z
-          cam_max_frame = self.change_frame(cam_max_frame, self.input_frame)
+          # cam_max_frame = self.change_frame(cam_max_frame, self.input_frame)
+
           cam_min_frame = PoseStamped()
           cam_min_frame.header.stamp = rospy.Time.now()
           cam_min_frame.header.frame_id = frame
           cam_min_frame.pose.position.x = cam_min_values.transform.translation.x
           cam_min_frame.pose.position.y =  cam_min_values.transform.translation.y
           cam_min_frame.pose.position.z =  cam_min_values.transform.translation.z
-          cam_min_frame = self.change_frame(cam_min_frame, self.input_frame)
+          # cam_min_frame = self.change_frame(cam_min_frame, self.input_frame)
+
           self.cam_params['min_x'] = cam_min_frame.pose.position.x 
           self.cam_params['max_x'] = cam_max_frame.pose.position.x 
           self.cam_params['min_y'] = cam_min_frame.pose.position.y 
           self.cam_params['max_y'] = cam_max_frame.pose.position.y 
           self.cam_params['min_z'] = cam_min_frame.pose.position.z
           self.cam_params['max_z'] = cam_max_frame.pose.position.z
+          self.cam_params['input_frame'] = frame
+          # print(self.cam_params, cam_min_frame, cam_max_frame)
         else:
           z_value_max = end_eff.transform.translation.z - self.arms_link_tf.transform.translation.z
           if z_value_max > 0.25:
